@@ -1,7 +1,14 @@
-##目前idea需要基于deep learning对信号进行处理
+##目前idea需要基于deep learning对信号进行处理，选择使用Keras进行模型搭建，首先对于编程环境进行构建。
+#1.安装anaconda，使用官网条件即可
+#2.运行anaconda prompt，进行环境安装
+#3.使用指令conda create -n **** python=**创建conda环境，这里创建EMG环境，python版本为3.6
+#4.安装Keras与tensorflow，使用pip install指令
+#5.使用anaconda中jupyterLab进行编程测试，代码为使用Mnist集训练手写数字
+
+
 from keras import layers
 from keras import models
-​
+#搭建网络结构，28*32*64*64*64*10的网络其中有两个池化层
 model = models.Sequential()
 model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
 model.add(layers.MaxPooling2D((2, 2)))
@@ -11,26 +18,38 @@ model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 model.add(layers.Flatten())
 model.add(layers.Dense(64, activation='relu'))
 model.add(layers.Dense(10, activation='relu'))
-model.summary()
-​
+model.summary()   ##显示网络结构和参数数量
+
+
+#训练与测试过程
 from keras.datasets import mnist
 from keras.utils import to_categorical
-​
+
 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
-​
+
 train_images = train_images.reshape((60000,28,28,1))
 train_images = train_images.astype('float32')/255
-​
+
 test_images = test_images.reshape((10000,28,28,1))
 test_images = test_images.astype('float32')/255
-​
+
 train_labels = to_categorical(train_labels)
 test_labels = to_categorical(test_labels)
-​
+
 model. compile(optimizer = 'rmsprop',
                loss='categorical_crossentropy',
                metrics = ['accuracy'])
-​
+               
+               
+#保存训练过程与结果，最后显示
+result = model.evaluate(x_test, y_test)
+print(result)
+
+
+
+
+
+###结果如下所示
 model.fit(train_images, train_labels, epochs = 5, batch_size = 64)
 Model: "sequential_5"
 _________________________________________________________________
