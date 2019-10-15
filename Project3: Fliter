@@ -1,0 +1,51 @@
+%%%找到一个非常适合课题的数据库，来自文章Dataset from spirometer and sEMG wireless sensor for diaphragmatic respiratory activity monitoring
+%%%其中数据直接可使用matlab处理
+%%%由于airflow信号含有较多噪声，在此进行滤波处理，程序如下
+
+clear all;
+load('S2.mat')
+air1= air_breathing;
+
+dt=0.0005;N=768000;
+n=1:N;t=n*dt;                                         
+f=n/(N*dt);                                             
+f1=3;f2=10; 
+
+                                           
+x=air1(:,2)';               
+subplot(2,2,1);plot(t,x);                               
+title('Before Filter');xlabel('Time/s');
+
+y=fft(x);                                              %对时域信号进行FFT变换
+xlim([0 12]);ylim([-1.5 1.5]);
+subplot(2,2,2);plot(f,abs(y)*2/N);                     %绘制原始信号的频域振幅图
+xlabel('Frequence/Hz');ylabel('Amplitude');
+xlim([0 50]);title('Frequence');
+ylim([0 0.8]);
+
+f1=8;f2=1500;                                             %要滤除频率的上下限，由于呼吸的频率很低，因此可以选用一低通滤波器形式
+yy=zeros(1,length(y));                                  %设置与y相同的元素数组
+for m=0:N-1                                             %将频率落在该频率范围内及其大于
+%小于奈奎斯特频率的滤波范围
+    if (m/(N*dt)>f1&m/(N*dt)<f2)|(m/(N*dt)>(1/dt-f2)&m/(N*dt)<(1/dt-f1));
+        %大于奈奎斯特频率的滤波范围
+        %1/dt为一个频率周期
+        yy(m+1)=0;                                     %将落在此频率范围内的振幅设置为0
+    else
+        if m<511;                                   %确定数组y(m+1)不溢出
+        yy(m+1)=y(m+1);                             %其余频率范围内的信号保持不变
+        end
+    end
+end
+subplot(2,2,4);plot(f,abs(yy)*2/N);                 %绘制滤波后的振幅谱
+xlim([0 50]);ylim([0 0.5]);
+xlabel('Frequence/Hz');ylabel('Amplitude');
+gstext=sprintf('Fliter out %4.1f-%4.1fHz Signal',f1,f2);
+%将滤波范围显示作为标题
+title(gstext);
+
+subplot(2,2,3);plot(t,real(ifft(yy)));
+%绘制滤波后的数据运用ifft变换回时域并绘图
+title('After Fliter');
+xlabel('Time/s');
+ylim([-0.6 0.6]);xlim([0 12]);
