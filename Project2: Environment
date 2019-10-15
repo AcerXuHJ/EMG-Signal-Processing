@@ -1,7 +1,7 @@
 ##目前idea需要基于deep learning对信号进行处理，选择使用Keras进行模型搭建，首先对于编程环境进行构建。
 #1.安装anaconda，使用官网条件即可
 #2.运行anaconda prompt，进行环境安装
-#3.使用指令conda create -n **** python=**创建conda环境，这里创建EMG环境，python版本为3.6 使用active ****激活
+#3.使用指令conda create -n **** python=**创建conda环境，这里创建EMG环境，python版本为3.6 使用activate ****激活
 #4.安装Keras与tensorflow，使用pip install指令
 #5.使用anaconda中jupyterLab进行编程测试，代码为使用Mnist集训练手写数字
 
