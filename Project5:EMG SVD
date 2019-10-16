@@ -1,0 +1,43 @@
+clear all;
+
+%%读取数据，数据库为P3中使用的数据库
+load('S2.mat')
+emg= emg_breathing;
+
+t=0:0.0005:375-0.0005;%总时间
+t1=0:0.0005:375-0.0005;%取出数据时间用于绘图
+t2=[0:0.0005:375-0.0005];
+
+
+x=emg(1:750000,2)';
+x1=x(1:1:end);
+x2=reshape(x1,75,10000);
+
+%进行SVD分解，分解后将获得75个奇异值，进行选择，这里第11个之后的奇异值全置为0
+
+[u, s v]=svd(x2);
+
+s1=s;u1=u;v1=v;
+
+for i=10:75
+    
+    s1(i,i)=0;
+
+    u1(i,i)=0;
+
+    v1(i,i)=0;
+end
+y2=u1*s1*v1';  %不要忘了这里是v1的转置矩阵
+
+
+
+
+y2=reshape(y2,1,750000);
+emg_d=x1-y2;
+emg_d(or(emg_d>0.03,emg_d<-0.03))=0;
+%绘图显示信号
+subplot(3,1,1);plot(t1,emg_d);title('EMG Signal after SVD');xlabel('t/s');ylabel('Amplitude/mV');%去除ECG的EMG信号
+subplot(3,1,3);plot(t1,x1,'r',t1,y2,'k');title('Raw EMG Signal');;xlabel('t/s');ylabel('Amplitude/mV');%原始EMG信号
+subplot(3,1,2);plot(t2,x);title('SVD Proces');;xlabel('t/s');ylabel('Amplitude/mV');%ECG信号
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
